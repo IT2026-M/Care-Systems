@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+<script>
+var PORTAL_URL = "https://care-systems.cef-eg.org/";
+
+function openPortal(event) {
+  try {
+    if (Office.context.requirements.isSetSupported("OpenBrowserWindowApi", "1.1")) {
+      Office.context.ui.openBrowserWindow(PORTAL_URL);
+    } else {
+      window.open(PORTAL_URL, "_blank");
+    }
+  } catch (e) {
+    try { window.open(PORTAL_URL, "_blank"); } catch (e2) {}
+  }
+  event.completed();
+}
+
+Office.onReady(function () {
+  if (Office.actions && Office.actions.associate) {
+    Office.actions.associate("openPortal", openPortal);
+  }
+});
+// Classic Outlook looks up the function on the global scope
+window.openPortal = openPortal;
+</script>
+</head>
+<body></body>
+</html>

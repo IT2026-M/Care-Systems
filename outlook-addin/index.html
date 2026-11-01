@@ -10,18 +10,60 @@
   main{padding:24px 18px;text-align:center}
   img{width:64px;height:64px}
   h1{font-size:18px;margin:14px 0 6px}
-  p{font-size:14px;margin:0 0 20px;color:#3E5C66;line-height:1.6}
-  a.btn{display:block;background:#0B4F6C;color:#fff;text-decoration:none;font-size:15px;font-weight:600;padding:12px;border-radius:8px}
-  a.btn:hover,a.btn:focus{background:#0E7C86;outline:2px solid #F5A623;outline-offset:2px}
+  p{font-size:14px;margin:0 0 18px;color:#3E5C66;line-height:1.6}
+  button{display:block;width:100%;border:0;cursor:pointer;font:inherit;font-size:15px;font-weight:600;padding:12px;border-radius:8px;margin-bottom:10px}
+  #open{background:#0B4F6C;color:#fff}
+  #open:hover{background:#0E7C86}
+  #copy{background:#fff;color:#0B4F6C;border:1px solid #0B4F6C}
+  button:focus-visible{outline:2px solid #F5A623;outline-offset:2px}
+  #msg{font-size:13px;color:#0E7C86;min-height:1.4em;margin:6px 0 0}
+  code{direction:ltr;display:block;font-size:12px;color:#3E5C66;word-break:break-all;margin-top:10px}
 </style>
 </head>
 <body>
 <main>
   <img src="icon-64.png" alt="">
   <h1>بوابة أنظمة CARE Egypt</h1>
-  <p>اضغط على الزر لفتح البوابة في المتصفح.</p>
-  <a class="btn" href="https://care-systems.cef-eg.org/" target="_blank" rel="noopener">فتح البوابة</a>
+  <p>البوابة هتفتح في المتصفح، وتقدر تضيفها للمفضلة من هناك.</p>
+  <button id="open" type="button">فتح البوابة في المتصفح</button>
+  <button id="copy" type="button">نسخ رابط البوابة</button>
+  <div id="msg" role="status"></div>
+  <code>https://care-systems.cef-eg.org/</code>
 </main>
-<script>Office.onReady(function(){});</script>
+<script>
+var URL_PORTAL = "https://care-systems.cef-eg.org/";
+var msg = document.getElementById("msg");
+
+function openInBrowser(){
+  try{
+    if (window.Office && Office.context && Office.context.requirements &&
+        Office.context.requirements.isSetSupported("OpenBrowserWindowApi","1.1")){
+      Office.context.ui.openBrowserWindow(URL_PORTAL);
+      msg.textContent = "تم فتح البوابة في المتصفح.";
+      return;
+    }
+  }catch(e){}
+  // Fallback for older Outlook versions
+  window.open(URL_PORTAL, "_blank");
+  msg.textContent = "لو فتحت في نافذة أوتلوك، استخدم «نسخ رابط البوابة» والصقه في المتصفح.";
+}
+
+function copyLink(){
+  function done(){ msg.textContent = "تم نسخ الرابط. الصقه في المتصفح (Ctrl+V)."; }
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(URL_PORTAL).then(done, fallback);
+  } else { fallback(); }
+  function fallback(){
+    var t = document.createElement("textarea");
+    t.value = URL_PORTAL; document.body.appendChild(t); t.select();
+    try{ document.execCommand("copy"); done(); }catch(e){ msg.textContent = "انسخ الرابط المكتوب تحت يدويًا."; }
+    document.body.removeChild(t);
+  }
+}
+
+document.getElementById("open").addEventListener("click", openInBrowser);
+document.getElementById("copy").addEventListener("click", copyLink);
+Office.onReady(function(){});
+</script>
 </body>
 </html>
